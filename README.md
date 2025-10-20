@@ -6,6 +6,11 @@
    - remove stop words
    - stemming
 
+2. TF-IDF 
+   - invert index
+   - term frequency 
+   - inverse document frequency
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
