@@ -1,15 +1,22 @@
 ### Learn RAG repo
 
 1. Preprocessing
+
    - remove punctuation
    - tokenization
    - remove stop words
    - stemming
 
-2. TF-IDF 
+2. TF-IDF
+
    - invert index
-   - term frequency 
+   - term frequency
    - inverse document frequency
+
+3. Keyword search
+   - term frequency saturation: prevents any single term from dominating search results just because it appears many many times.
+   - document length normalization: ensuring longer documents don't get unfair advantages over shorter, more focused ones
+   - okapi BM25 algorithm
 
 ### How to run project - Ubuntu/WSL
 
