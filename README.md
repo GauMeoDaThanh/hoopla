@@ -18,10 +18,19 @@
    - document length normalization: ensuring longer documents don't get unfair advantages over shorter, more focused ones
    - okapi BM25 algorithm
 
+4. Semantic search
+   - Vector operation
+   - Dimension
+   - Embedding
+   - Dot product similarity
+   - Cosine similarity
+   - Locality-Sensitive Hashing (LSH)
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
 2. `git clone https://github.com/GauMeoDaThanh/hoopla.git`
 3. `cd hoopla`
-4. `source .venv/bin/activate`
-5. `uv run cli/keyword_search_cli.py`
+4. `uv venv`
+5. `source .venv/bin/activate`
+6. `uv run cli/keyword_search_cli.py`
