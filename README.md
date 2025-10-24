@@ -34,6 +34,11 @@
    - Edge cases
    - ColBERT & Late chunking
 
+6. Hybrid Search
+   - Score normalization
+   - Weighted combination
+   - Reciprocal Rank Fusion
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
