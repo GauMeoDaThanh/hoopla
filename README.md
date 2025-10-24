@@ -26,6 +26,14 @@
    - Cosine similarity
    - Locality-Sensitive Hashing (LSH)
 
+5. Chunking
+   - Chunking
+   - Overlap
+   - Semantic chunking
+   - Embedding chunk
+   - Edge cases
+   - ColBERT & Late chunking
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
