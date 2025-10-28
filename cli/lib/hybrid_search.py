@@ -3,8 +3,6 @@ import os
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
 from .search_utils import load_movies
-
-
 class HybridSearch:
     def __init__(self, documents):
         self.documents = documents
@@ -102,10 +100,10 @@ def weighted_search_command(query, alpha=0.5, limit=5):
         print(f"   BM25: {result.get('bm25_score', 0):.3f}   Semantic: {result.get('semantic_score', 0):.3f}")
         print(f"   Document: {result['document'][:100]}...")
 
-def rrf_search_command(query, k=60, limit=5):
+def rrf_search_command(query, k=60, limit=5, enhance=None):
     movies = load_movies()
-    hybrid_score = HybridSearch(movies)
-    search_results = hybrid_score.rrf_search(query, k, limit)
+    hybrid_search = HybridSearch(movies)
+    search_results = hybrid_search.rrf_search(query, k, limit)
 
     for idx, result in enumerate(search_results, start=1):
         print(f"{idx}. {result['title']}")

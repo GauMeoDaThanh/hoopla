@@ -39,6 +39,12 @@
    - Weighted combination
    - Reciprocal Rank Fusion
 
+7. LLMs
+   - Spell correction
+   - Query rewriting
+   - Query expansion
+
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
