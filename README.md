@@ -44,6 +44,10 @@
    - Query rewriting
    - Query expansion
 
+8. Reranking
+   - LLM re-ranking
+   - LLM batch re-ranking
+   - Cross-Encoder re-ranking
 
 ### How to run project - Ubuntu/WSL
 

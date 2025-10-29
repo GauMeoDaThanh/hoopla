@@ -100,13 +100,9 @@ def weighted_search_command(query, alpha=0.5, limit=5):
         print(f"   BM25: {result.get('bm25_score', 0):.3f}   Semantic: {result.get('semantic_score', 0):.3f}")
         print(f"   Document: {result['document'][:100]}...")
 
-def rrf_search_command(query, k=60, limit=5, enhance=None):
+def rrf_search_command(query, k=60, limit=5):
     movies = load_movies()
     hybrid_search = HybridSearch(movies)
     search_results = hybrid_search.rrf_search(query, k, limit)
+    return search_results
 
-    for idx, result in enumerate(search_results, start=1):
-        print(f"{idx}. {result['title']}")
-        print(f"   Hybrid Score: {result['hybrid_score']:.3f}")
-        print(f"   BM25 Rank: {result.get('bm25_rank', 0)}   Semantic Rank: {result.get('semantic_rank', 0)}")
-        print(f"   Document: {result['document'][:100]}...")

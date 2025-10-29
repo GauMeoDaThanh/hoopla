@@ -1,10 +1,14 @@
 import argparse
+from urllib import response
 from lib.hybrid_search import (
     normalize_scores,
     weighted_search_command,
     rrf_search_command
 )
-from lib.gemini import generate_content
+from lib.gemini import (
+    generate_enhance_query,
+    rerank_response
+)
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Hybrid Search CLI")
@@ -46,6 +50,9 @@ def main() -> None:
         choices=["spell", "rewrite", "expand"],
         help="Enhancement technique to apply"
     )
+    rrf_search_parser.add_argument(
+        "--rerank-method", type=str, choices=["individual", "batch", "cross_encoder"], help="Reranking method to use", default=None
+    )
 
     args = parser.parse_args()
 
@@ -58,62 +65,22 @@ def main() -> None:
             weighted_search_command(args.query, args.alpha, args.limit)
         case "rrf-search":
             query = args.query
-            if args.enhance == "spell":
-                prompt = f"""Fix any spelling errors in this movie search query.
-
-                Only correct obvious typos. Don't change correctly spelled words.
-
-                Query: "{query}"
-
-                If no errors, return the original query.
-                Corrected:"""
-
-                response = generate_content(prompt).text.strip()
+            limit = args.limit * 5 if args.rerank_method else args.limit
+            if args.enhance:
+                query = generate_enhance_query(args.query, args.enhance)
                 print(f"Enhanced query ({args.enhance}): {query} -> {response}\n")
-                query = response
-            if args.enhance == "rewrite":
-                prompt = f"""Rewrite this movie search query to be more specific and searchable.
 
-                Original: "{query}"
+            search_results = rrf_search_command(query, args.k,  limit)
+            rerank_results = rerank_response(query, search_results, args.limit, args.rerank_method)
 
-                Consider:
-                - Common movie knowledge (famous actors, popular films)
-                - Genre conventions (horror = scary, animation = cartoon)
-                - Keep it concise (under 10 words)
-                - It should be a google style search query that's very specific
-                - Don't use boolean logic
-
-                Examples:
-
-                - "that bear movie where leo gets attacked" -> "The Revenant Leonardo DiCaprio bear attack"
-                - "movie about bear in london with marmalade" -> "Paddington London marmalade"
-                - "scary movie with bear from few years ago" -> "bear horror movie 2015-2020"
-
-                Rewritten query:"""
-
-                response = generate_content(prompt).text.strip()
-                print(f"Enhanced query ({args.enhance}): {query} -> {response}\n")
-                query = response
-            if args.enhance == "expand":
-                prompt = f"""Expand this movie search query with related terms.
-
-                Add synonyms and related concepts that might appear in movie descriptions.
-                Keep expansions relevant and focused.
-                This will be appended to the original query.
-
-                Examples:
-
-                - "scary bear movie" -> "scary horror grizzly bear movie terrifying film"
-                - "action movie with bear" -> "action thriller bear chase fight adventure"
-                - "comedy with bear" -> "comedy funny bear humor lighthearted"
-
-                Query: "{query}"
-                """
-                response = generate_content(prompt).text.strip()
-                print(f"Enhanced query ({args.enhance}): {query} -> {response}\n")
-                query = response
-
-            rrf_search_command(query, args.k, args.limit, args.enhance)
+            for idx, result in enumerate(rerank_results, start=1):
+                print(f"{idx}. {result['title']}")
+                print(f"   Rerank Score: {result.get('rerank_score', 0):.3f}") if 'rerank_score' in result else ""
+                print(f"   Rerank Rank : {result.get('rerank_rank', 0)}") if 'rerank_rank' in result else ""
+                print(f"   Cross Encoder Score: {result.get('cross_encoder_score', 0):.3f}") if 'cross_encoder_score' in result else ""
+                print(f"   Hybrid Score: {result['hybrid_score']:.3f}")
+                print(f"   BM25 Rank: {result.get('bm25_rank', 0)}   Semantic Rank: {result.get('semantic_rank', 0)}")
+                print(f"   Document: {result['document'][:100]}...")
         case _:
             parser.print_help()
 
