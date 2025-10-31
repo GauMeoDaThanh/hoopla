@@ -49,6 +49,13 @@
    - LLM batch re-ranking
    - Cross-Encoder re-ranking
 
+9. Evaluation
+   - Precision metrics
+   - Recall metrics
+   - F1 Score
+   - Error analysis
+   - LLM evaluation
+
 ### How to run project - Ubuntu/WSL
 
 1. `curl -LsSf https://astral.sh/uv/install.sh | sh`
