@@ -97,3 +97,62 @@ Return ONLY the scores in the same order you were given the documents. Return a 
     for idx in range(len(scores)):
         results[idx]['llm_evaluate_score'] = int(scores[idx].strip())
     return scores
+
+def augment_feedback(query, docs):
+    prompt = f"""Answer the question or provide information based on the provided documents. This should be tailored to Hoopla users. Hoopla is a movie streaming service.
+
+    Query: {query}
+
+    Documents:
+    {docs}
+
+    Provide a comprehensive answer that addresses the query:"""
+
+    response = client.models.generate_content(model=model, contents=prompt)
+
+    return response.text
+
+def summarize_query_results(query, results):
+    prompt = f"""
+Provide information useful to this query by synthesizing information from multiple search results in detail.
+The goal is to provide comprehensive information so that users know what their options are.
+Your response should be information-dense and concise, with several key pieces of information about the genre, plot, etc. of each movie.
+This should be tailored to Hoopla users. Hoopla is a movie streaming service.
+Query: {query}
+Search Results:
+{results}
+Provide a comprehensive 3–4 sentence answer that combines information from multiple sources:
+"""
+    
+    response = client.models.generate_content(model=model, contents=prompt)
+    return response.text
+
+def generate_answer_with_citations(search_results, query, limit=5):
+    context = ""
+
+    for i, result in enumerate(search_results[:limit], start=1):
+        context += f"[{i}]: {result['title']}; {result['document']}\n\n"
+
+    prompt = f"""Answer the question or provide information based on the provided documents.
+
+This should be tailored to Hoopla users. Hoopla is a movie streaming service.
+
+If not enough information is available to good answer, say so but give as good as an answer as you can while citing the sources you have.
+
+Query: {query}
+
+Documents:
+{context}
+
+Instructions:
+- Provide a comprehensive answer that addresses the query
+- Cite sources using [1], [2], etc. format when referencing information
+- If sources disagree, mention the different viewpoints
+- If the answer isn't in the documents, say "I don't have enough information"
+- Be direct and informative
+
+Answer:"""
+
+    response = client.models.generate_content(model=model, contents=prompt)
+
+    return (response.text or "").strip()

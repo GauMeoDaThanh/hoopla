@@ -3,8 +3,7 @@ from typing import Optional
 
 from .keyword_search import InvertedIndex
 from .gemini import (
-    enhance_query,
-    evaluate_search_results
+    enhance_query
 )
 from .reranking import rerank
 from .search_utils import (
@@ -208,35 +207,23 @@ def rrf_search_command(
     enhance: Optional[str] = None,
     rerank_method: Optional[str] = None,
     limit: int = DEFAULT_SEARCH_LIMIT,
-    evaluate: bool = False,
 ) -> dict:
     movies = load_movies()
     searcher = HybridSearch(movies)
 
     original_query = query
-    print(f"Original query: '{original_query}'")
-
     enhanced_query = None
     if enhance:
         enhanced_query = enhance_query(query, method=enhance)
-        print(f"Enhanced query: '{enhanced_query}'")
         query = enhanced_query
 
     search_limit = limit * SEARCH_MULTIPLIER if rerank_method else limit
     results = searcher.rrf_search(query, k, search_limit)
-    print(f"RRF search: {[res['title'] for res in results]}")
-
 
     reranked = False
     if rerank_method:
         results = rerank(query, results, method=rerank_method, limit=limit)
-        print(f"Reranked results: {[res['title'] for res in results]}")
-
         reranked = True
-
-    if evaluate:
-        llm_evaluate_scores = evaluate_search_results(query, results)
-
 
     return {
         "original_query": original_query,
@@ -247,5 +234,4 @@ def rrf_search_command(
         "rerank_method": rerank_method,
         "reranked": reranked,
         "results": results,
-        "llm_evaluate_scores": llm_evaluate_scores
     }

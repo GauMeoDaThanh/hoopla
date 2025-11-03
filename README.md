@@ -14,11 +14,13 @@
    - inverse document frequency
 
 3. Keyword search
+
    - term frequency saturation: prevents any single term from dominating search results just because it appears many many times.
    - document length normalization: ensuring longer documents don't get unfair advantages over shorter, more focused ones
    - okapi BM25 algorithm
 
 4. Semantic search
+
    - Vector operation
    - Dimension
    - Embedding
@@ -27,6 +29,7 @@
    - Locality-Sensitive Hashing (LSH)
 
 5. Chunking
+
    - Chunking
    - Overlap
    - Semantic chunking
@@ -35,26 +38,35 @@
    - ColBERT & Late chunking
 
 6. Hybrid Search
+
    - Score normalization
    - Weighted combination
    - Reciprocal Rank Fusion
 
 7. LLMs
+
    - Spell correction
    - Query rewriting
    - Query expansion
 
 8. Reranking
+
    - LLM re-ranking
    - LLM batch re-ranking
    - Cross-Encoder re-ranking
 
 9. Evaluation
+
    - Precision metrics
    - Recall metrics
    - F1 Score
    - Error analysis
    - LLM evaluation
+
+10. Augmented Generation
+      - LLM summarization
+      - Adding citations
+      - Question Answering
 
 ### How to run project - Ubuntu/WSL
 

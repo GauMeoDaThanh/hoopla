@@ -60,12 +60,12 @@ class SemanticSearch:
     def search(self, query, limit=DEFAULT_SEARCH_LIMIT):
         if self.embeddings is None or self.embeddings.size == 0:
             raise ValueError(
-                "No embeddings loaded. Call load_or_create_embeddings first."
+                "No embeddings loaded. Call `load_or_create_embeddings` first."
             )
 
         if self.documents is None or len(self.documents) == 0:
             raise ValueError(
-                "No documents loaded. Call load_or_create_embeddings first."
+                "No documents loaded. Call `load_or_create_embeddings` first."
             )
 
         query_embedding = self.generate_embedding(query)
@@ -160,8 +160,11 @@ def fixed_size_chunking(
 
     n_words = len(words)
     i = 0
-    while i < n_words - overlap:
+    while i < n_words:
         chunk_words = words[i : i + chunk_size]
+        if chunks and len(chunk_words) <= overlap:
+            break
+
         chunks.append(" ".join(chunk_words))
         i += chunk_size - overlap
 
@@ -184,25 +187,34 @@ def semantic_chunk(
     max_chunk_size: int = DEFAULT_SEMANTIC_CHUNK_SIZE,
     overlap: int = DEFAULT_CHUNK_OVERLAP,
 ) -> list[str]:
-    # strip leading and trailing whitespace
     text = text.strip()
-    if text == "":
+
+    if not text:
         return []
 
-    # split text into sentences using regex
     sentences = re.split(r"(?<=[.!?])\s+", text)
-    if len(sentences) == 1 and not sentences[0].endswith((".", "!", "?")):
-        sentences = text
-    sentences = [s.strip() for s in sentences if s.strip() != ""]
+
+    if len(sentences) == 1 and not text.endswith((".", "!", "?")):
+        sentences = [text]
 
     chunks = []
     i = 0
     n_sentences = len(sentences)
 
-    while i < n_sentences - overlap:
+    while i < n_sentences:
         chunk_sentences = sentences[i : i + max_chunk_size]
-        chunks.append(" ".join(chunk_sentences))
+        if chunks and len(chunk_sentences) <= overlap:
+            break
+
+        cleaned_sentences = []
+        for chunk_sentence in chunk_sentences:
+            cleaned_sentences.append(chunk_sentence.strip())
+        if not cleaned_sentences:
+            continue
+        chunk = " ".join(cleaned_sentences)
+        chunks.append(chunk)
         i += max_chunk_size - overlap
+
     return chunks
 
 
@@ -219,7 +231,6 @@ def semantic_chunk_text(
 
 class ChunkedSemanticSearch(SemanticSearch):
     def __init__(self, model_name: str = "all-MiniLM-L6-v2") -> None:
-        """Initialize chunked semantic search"""
         super().__init__(model_name)
         self.chunk_embeddings = None
         self.chunk_metadata = None
@@ -264,10 +275,10 @@ class ChunkedSemanticSearch(SemanticSearch):
         return self.chunk_embeddings
 
     def load_or_create_chunk_embeddings(self, documents: list[dict]) -> np.ndarray:
+        self.documents = documents
         self.document_map = {}
         for doc in documents:
             self.document_map[doc["id"]] = doc
-        self.documents = documents
 
         if os.path.exists(CHUNK_EMBEDDINGS_PATH) and os.path.exists(
             CHUNK_METADATA_PATH
